@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    /* Basic Reset */
+city {
+    margin-bottom: 20px; /* Add spacing between cities within a country */
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif; /* Choose a suitable font */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header & Navigation */
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+}
+
+nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav li a {
+    text-decoration: none;
+    color: #333;
+    margin: 0 15px;
+}
+
+.search {
+    display: flex;
+}
+
+.search input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+}
+
+.search button {
+    padding: 8px 12px;
+    background-color: #007bff; /* Example color */
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+
+/* Hero Section */
+.hero {
+    background-image: url('https://content.tui.co.uk/adamtui/2021_4/19_8/923955e4-e224-47f9-bcc0-ad0f0093fb79/ACC_969902_shutterstock_1672881559WebOriginalCompressed.jpg?i10c=img.resize(width:1080);img.crop(width:1080%2Cheight:608)');
+    background-size: cover;
+    background-position: center;
+    min-height: 600px; /* Adjust as needed */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+}
+
+.hero-content {
+    padding: 20px;
+}
+
+.hero-content h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.hero-content p {
+    margin-bottom: 20px;
+}
+
+.hero-content button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Example color */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.social-icons a {
+    color: #fff;
+    margin: 0 10px;
+    font-size: 1.2em;
+}
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Recommendations</title>
+    <link rel="stylesheet" href="style.css"> 
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script> 
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="container">
+                <div class="logo">TravelBloom</div> 
+                <ul>
+                    <li><a href="travel_recommendation.html">Home</a></li> 
+                <li><a href="aboutUs.html">About Us</a></li>
+                <li><a href="contactUs.html">Contact Us</a></li>
+                </ul>
+                <div class="search">
+                    <input type="text" id="search-bar" placeholder="Enter a destination or keyword">
+                    <button id="search-button">Search</button>
+                    <button id="reset-button">Clear</button> 
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home-page">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>EXPLORE</h1>
+                    <h1>DREAM</h1>
+                    <h1>DESTINATION</h1>
+                    <p>It encourages exploration of unfamiliar territories, embracing diverse cultures and landscapes, while pursuing the desired destination that captivates the heart and ignites a sense of wonder.</p>
+                    <button>BOOK NOW</button> 
+                </div>
+            </div>
+        </section>
+
+        <div id="content">
+            </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a> 
+            </div>
+        </div>
+    </footer>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Fetch data from travel_recommendation_api.json
+    fetch('travel_recommendation_api.json')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Check if data is fetched correctly
+
+            // Handle search and display recommendations
+            const searchBar = document.getElementById('search-bar');
+            const searchButton = document.getElementById('search-button');
+            const resetButton = document.getElementById('reset-button');
+            const contentDiv = document.getElementById('content');
+
+            searchButton.addEventListener('click', () => {
+                const keyword = searchBar.value.toLowerCase();
+
+                // Filter data based on keyword (countries, temples, or beaches)
+                let filteredData = [];
+                if (keyword === 'country' || keyword === 'countries') {
+                    filteredData = data.countries.flatMap(country => country.cities); 
+                } else if (keyword === 'temple' || keyword === 'temples') {
+                    filteredData = data.temples;
+                } else if (keyword === 'beach' || keyword === 'beaches') {
+                    filteredData = data.beaches;
+                } else {
+                    // If keyword doesn't match any category, search within all
+                    filteredData = data.countries.flatMap(country => country.cities)
+                        .concat(data.temples)
+                        .concat(data.beaches)
+                        .filter(item => {
+                            const name = item.name.toLowerCase();
+                            return name.includes(keyword); 
+                        });
+                }
+
+                displayRecommendations(filteredData);
+            });
+
+            resetButton.addEventListener('click', () => {
+                searchBar.value = '';
+                contentDiv.innerHTML = ''; // Clear results
+            });
+
+            // Initial display (home page)
+            displayHomePage();
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+    function displayHomePage() {
+        // This function now leverages the new HTML structure
+        // You might not need to modify it much, or you can adjust it to fit your needs
+    }
+
+    function displayRecommendations(recommendations) {
+        contentDiv.innerHTML = ''; // Clear previous content
+
+        if (recommendations.length === 0) {
+            contentDiv.innerHTML = '<p>No recommendations found.</p>';
+            return;
+        }
+
+        recommendations.forEach(item => {
+            const recommendationDiv = document.createElement('div');
+            recommendationDiv.classList.add('recommendation'); // Add a class for styling
+            recommendationDiv.innerHTML = `
+                <h2>${item.name}</h2>
+                <img src="${item.imageUrl}" alt="${item.name}">
+                <p>${item.description}</p>
+            `;
+            contentDiv.appendChild(recommendationDiv);
+        });
+    }
+});
+searchButton.addEventListener('click', () => {
+    const keyword = searchBar.value.toLowerCase(); // Convert to lowercase for case-insensitive search
+
+    // Filter data based on keyword (countries, temples, or beaches)
+    let filteredData = [];
+    if (keyword === 'country' || keyword === 'countries') {
+        filteredData = data.countries.flatMap(country => country.cities); 
+    } else if (keyword === 'temple' || keyword === 'temples') {
+        filteredData = data.temples;
+    } else if (keyword === 'beach' || keyword === 'beaches') {
+        filteredData = data.beaches;
+    } else {
+        // If keyword doesn't match any category, search within all
+        filteredData = data.countries.flatMap(country => country.cities)
+            .concat(data.temples)
+            .concat(data.beaches)
+            .filter(item => {
+                const name = item.name.toLowerCase();
+                return name.includes(keyword); 
+            });
+    }
+
+    displayRecommendations(filteredData);
+});
+function displayRecommendations(recommendations) {
+    contentDiv.innerHTML = ''; // Clear previous content
+
+    if (recommendations.length === 0) {
+        contentDiv.innerHTML = '<p>No recommendations found.</p>';
+        return;
+    }
+
+    // Display at least two recommendations (or all if less than two are found)
+    const numToDisplay = Math.min(recommendations.length, 2); 
+
+    for (let i = 0; i < numToDisplay; i++) {
+        const item = recommendations[i];
+        const recommendationDiv = document.createElement('div');
+        recommendationDiv.classList.add('recommendation');
+
+        // Check if the recommendation is a city (part of a country)
+        if (item.hasOwnProperty('cities')) { 
+            // If it's a country, display its cities
+            item.cities.forEach(city => {
+                const cityDiv = document.createElement('div');
+                cityDiv.classList.add('city'); 
+                cityDiv.innerHTML = `
+                    <h3>${city.name}</h3>
+                    <img src="${city.imageUrl}" alt="${city.name}">
+                    <p>${city.description}</p>
+                `;
+                recommendationDiv.appendChild(cityDiv);
+            });
+        } else {
+            // If it's a temple or beach, display it directly
+            recommendationDiv.innerHTML = `
+                <h2>${item.name}</h2>
+                <img src="${item.imageUrl}" alt="${item.name}">
+                <p>${item.description}</p>
+            `;
+        }
+
+        contentDiv.appendChild(recommendationDiv);
+    }
+}
+    </script>
+
+</body>
+</html>
